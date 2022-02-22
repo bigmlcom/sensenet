@@ -15,6 +15,7 @@ from sensenet import __version__, __tree_ext_prefix__
 
 here = path.abspath(path.dirname(__file__))
 
+TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
 TF_VER = ">=2.8,<2.9"
 M1 = "sys_platform=='Darwin' and platform_machine=='arm64'"
 OTHER = "sys_platform!='Darwin' or platform_machine!='arm64'"
@@ -30,7 +31,7 @@ deps = [
 # docker images distributed by the Tensorflow team.  If they've
 # installed tensorflow-gpu, we shouldn't try to install tensorflow on
 # top of them.
-if not any(pkg.key == "tensorflow-gpu" for pkg in pkg_resources.working_set):
+if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
     deps += [
         # MacOS running on the M1 has a specific tensorflow build
         "tensorflow-macos%s;%s" % (TF_VER, M1),
