@@ -7,9 +7,10 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      CIBW_BUILD: cp38-* cp39-* cp310-*
     strategy:
       matrix:
-        python: [3.8, 3.9, 3.10]
         os: [ubuntu-20.04, windows-2019, macos-10.14]
 
     steps:
