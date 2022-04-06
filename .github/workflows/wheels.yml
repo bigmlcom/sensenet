@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CIBW_BUILD: cp38-* cp39-* cp310-*
-      CIBW_SKIP: cp36-* *-win32
+      CIBW_SKIP: cp36-* *-win32 *-manylinux_i686 pp* *musllinux*
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'POLICY_JSON=$(find / -name manylinux-policy.json);sed -i "s/libresolv.so.2\"/libresolv.so.2\", \"libtensorflow_framework.so.1\", \"libtensorflow_framework.so.2\"/g" $POLICY_JSON; cat $POLICY_JSON; auditwheel repair -w {dest_dir} {wheel}'
     strategy:
       matrix:
