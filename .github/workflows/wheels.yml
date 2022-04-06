@@ -13,7 +13,7 @@ jobs:
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: 'POLICY_JSON=$(find / -name manylinux-policy.json);sed -i "s/libresolv.so.2\"/libresolv.so.2\", \"libtensorflow_framework.so.1\", \"libtensorflow_framework.so.2\"/g" $POLICY_JSON; cat $POLICY_JSON; auditwheel repair -w {dest_dir} {wheel}'
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-10.14]
+        os: [ubuntu-20.04, macos-10.14]
 
     steps:
       - uses: actions/checkout@v2
