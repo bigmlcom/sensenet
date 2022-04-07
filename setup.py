@@ -6,8 +6,9 @@ try:
 except ModuleNotFoundError:
     raise ImportError("Tensorflow is not in the build environment.")
 
-import pkg_resources
 import os
+import sys
+import pkg_resources
 import setuptools
 
 from sensenet import __version__, __tree_ext_prefix__
@@ -42,19 +43,22 @@ with open(os.path.join(here, "README.md"), "r") as f:
     long_description = f.read()
 
 if os.name == "nt":
-    compile_args = ["/std:c++14"] + tf.sysconfig.get_compile_flags()
+    modules = []
 else:
     compile_args = ["-std=c++14", "-fPIC"] + tf.sysconfig.get_compile_flags()
+    sys.stderr.write(tf.sysconfig.get_lib() + "\n")
+    sys.stderr.flush()
+    tree_module = setuptools.Extension(
+        __tree_ext_prefix__,
+        define_macros=[("MAJOR_VERSION", "1"), ("MINOR_VERSION", "1")],
+        include_dirs=[tf.sysconfig.get_include()],
+        library_dirs=[tf.sysconfig.get_lib()],
+        extra_compile_args=compile_args,
+        extra_link_args=tf.sysconfig.get_link_flags(),
+        sources=["cpp/tree_op.cc"],
+    )
 
-tree_module = setuptools.Extension(
-    __tree_ext_prefix__,
-    define_macros=[("MAJOR_VERSION", "1"), ("MINOR_VERSION", "1")],
-    include_dirs=[tf.sysconfig.get_include()],
-    library_dirs=[tf.sysconfig.get_lib()],
-    extra_compile_args=compile_args,
-    extra_link_args=tf.sysconfig.get_link_flags(),
-    sources=["cpp/tree_op.cc"],
-)
+    modules = [tree_module]
 
 setuptools.setup(
     name="bigml-sensenet",
@@ -67,6 +71,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     package_data={"sensenet": ["sensenet_metadata.json.gz"]},
-    ext_modules=[tree_module],
+    ext_modules=modules,
     install_requires=deps,
 )
