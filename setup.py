@@ -8,6 +8,7 @@ except ModuleNotFoundError:
 
 import os
 import sys
+import platform
 import pkg_resources
 import setuptools
 
@@ -17,14 +18,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
 TF_VER = ">=2.8,<2.9"
-M1 = "sys_platform=='Darwin' and platform_machine=='arm64'"
-OTHER = "sys_platform!='Darwin' or platform_machine!='arm64'"
 
 deps = [
     "importlib-resources>=5.4,<5.5",
-    "numpy>=1.21,<1.22",
     "pillow>=9.0,<9.1",
-    "tensorflowjs>=3.13,<3.14",
 ]
 
 # The installation of `tensorflow-gpu` should be specific to canonical
@@ -32,11 +29,21 @@ deps = [
 # installed tensorflow-gpu, we shouldn't try to install tensorflow on
 # top of them.
 if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
-    deps += [
-        # MacOS running on the M1 has a specific tensorflow build
-        "tensorflow-macos%s;%s" % (TF_VER, M1),
-        "tensorflow%s;%s" % (TF_VER, OTHER),
-    ]
+    # If we do have to grab tensorflow, pull in the correct package
+    # for our architecture
+    if platform.machine() == 'aarch64' and platform.system() == "Linux":
+        deps += ["tensorflow-aarch64%s" % TF_VER]
+    elif platform.machine() == 'arm64' and platform.system() == "Darwin":
+        deps += ["tensorflow-macos%s" % TF_VER]
+    else:
+        deps += ["tensorflow%s" % TF_VER]
+
+# Unfortunately, there's no tensorflowjs package on pypi for aarch64,
+# as far as I can tell.  Also, it seems that the aarch64 build is
+# quite picky about its numpy version, and you have to let it pull in
+# the exact version that tensorflow was built with.
+if platform.machine() != 'aarch64':
+    deps += ["tensorflowjs>=3.13,<3.14", "numpy>=1.21,<1.22"]
 
 # Get the long description from the relevant file
 with open(os.path.join(here, "README.md"), "r") as f:

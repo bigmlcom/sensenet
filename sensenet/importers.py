@@ -26,7 +26,11 @@ with warnings.catch_warnings():
 
     import tensorflow
     import tensorflow.keras.layers
-    import tensorflowjs
+
+    try:
+        import tensorflowjs
+    except:
+        tensorflowjs = None
 
 bigml_tf_module = None
 
