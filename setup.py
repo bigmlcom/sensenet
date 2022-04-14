@@ -1,11 +1,6 @@
 """Setup for package sensenet
 """
 
-try:
-    import tensorflow as tf
-except ModuleNotFoundError:
-    raise ImportError("Tensorflow is not in the build environment.")
-
 import os
 import sys
 import platform
@@ -52,6 +47,11 @@ with open(os.path.join(here, "README.md"), "r") as f:
 if os.name == "nt":
     modules = []
 else:
+    try:
+        import tensorflow as tf
+    except ModuleNotFoundError:
+        raise ImportError("Tensorflow is not in the build environment.")
+
     compile_args = ["-std=c++14", "-fPIC"] + tf.sysconfig.get_compile_flags()
     sys.stderr.write(tf.sysconfig.get_lib() + "\n")
     sys.stderr.flush()
