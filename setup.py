@@ -15,7 +15,6 @@ TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
 TF_VER = ">=2.8,<2.9"
 
 deps = [
-    "importlib-resources>=5.7,<5.8",
     "pillow>=9.1,<9.2",
 ]
 

@@ -15,10 +15,7 @@ BUNDLE_FORMAT = "%s_extractor_%s.smbundle"
 
 
 def read_resource(afile):
-    try:
-        import importlib.resources as pkg_resources
-    except ImportError:
-        import importlib_resources as pkg_resources
+    import importlib.resources as pkg_resources
 
     cmp_bytes = pkg_resources.read_binary(__package__, afile)
     astr = gzip.decompress(cmp_bytes).decode("utf-8")
