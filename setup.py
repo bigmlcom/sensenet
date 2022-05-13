@@ -15,8 +15,8 @@ TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
 TF_VER = ">=2.8,<2.9"
 
 deps = [
-    "importlib-resources>=5.4,<5.5",
-    "pillow>=9.0,<9.1",
+    "importlib-resources>=5.7,<5.8",
+    "pillow>=9.1,<9.2",
 ]
 
 # The installation of `tensorflow-gpu` should be specific to canonical
@@ -26,9 +26,9 @@ deps = [
 if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
     # If we do have to grab tensorflow, pull in the correct package
     # for our architecture
-    if platform.machine() == 'aarch64' and platform.system() == "Linux":
+    if platform.machine() == "aarch64" and platform.system() == "Linux":
         deps += ["tensorflow-aarch64%s" % TF_VER]
-    elif platform.machine() == 'arm64' and platform.system() == "Darwin":
+    elif platform.machine() == "arm64" and platform.system() == "Darwin":
         deps += ["tensorflow-macos%s" % TF_VER]
     else:
         deps += ["tensorflow%s" % TF_VER]
@@ -37,7 +37,7 @@ if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
 # as far as I can tell.  Also, it seems that the aarch64 build is
 # quite picky about its numpy version, and you have to let it pull in
 # the exact version that tensorflow was built with.
-if platform.machine() != 'aarch64':
+if platform.machine() in ["aarch64", "arm64"]:
     deps += ["tensorflowjs>=3.13,<3.14", "numpy>=1.21,<1.22"]
 
 # Get the long description from the relevant file
