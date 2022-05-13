@@ -36,7 +36,7 @@ if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
 # as far as I can tell.  Also, it seems that the aarch64 build is
 # quite picky about its numpy version, and you have to let it pull in
 # the exact version that tensorflow was built with.
-if platform.machine() in ["aarch64", "arm64"]:
+if platform.machine() not in ["aarch64", "arm64"]:
     deps += ["tensorflowjs>=3.13,<3.14", "numpy>=1.21,<1.22"]
 
 # Get the long description from the relevant file
