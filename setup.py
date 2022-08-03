@@ -12,7 +12,7 @@ from sensenet import __version__, __tree_ext_prefix__
 here = os.path.abspath(os.path.dirname(__file__))
 
 TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
-TF_VER = ">=2.8,<2.9"
+TF_VER = ">=2.9,<2.10"
 
 deps = [
     "pillow>=9.1,<9.2",

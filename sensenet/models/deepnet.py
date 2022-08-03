@@ -77,12 +77,12 @@ def deepnet_model(model, input_settings):
     trees = tree_preprocessor(model)
 
     raw_inputs = instantiate_inputs(model, settings)
-    inputs = preprocessor(raw_inputs)
+    features = preprocessor(raw_inputs)
 
     if trees:
-        treeed_inputs = trees(inputs)
+        tree_features = trees(features)
     else:
-        treeed_inputs = None
+        tree_features = None
 
-    predictions = apply_layers(model, settings, inputs, treeed_inputs)
+    predictions = apply_layers(model, settings, features, tree_features)
     return tf.keras.Model(inputs=raw_inputs, outputs=predictions)

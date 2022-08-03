@@ -9,9 +9,8 @@ import gzip
 
 from PIL import Image
 
-from sensenet.constants import DCT
-from sensenet.load import to_image_pixels
-from sensenet.models.wrappers import create_model
+import sensenet.load as load
+import sensenet.models.wrappers as wrappers
 
 from .utils import TEST_DATA_DIR, TEST_IMAGE_DATA
 from .test_pretrained import check_image_prediction
@@ -30,7 +29,7 @@ def make_mobilenet(settings):
     with gzip.open(MOBILENET_PATH, "rb") as fin:
         network = json.load(fin)
 
-    return create_model(network, settings)
+    return wrappers.create_model(network, settings)
 
 
 def check_pixels_and_file(settings, pos_threshold, neg_threshold):
@@ -103,7 +102,7 @@ def test_text():
     with gzip.open(TEXT_MODEL_PATH, "rb") as fin:
         network = json.load(fin)
 
-    text_model = create_model(network)
+    text_model = wrappers.create_model(network)
     assert text_model._model is not None
 
 
@@ -111,7 +110,7 @@ def test_image_plus_categorical():
     with gzip.open(TWO_FIELD_MODEL_PATH, "rb") as fin:
         network = json.load(fin)
 
-    model = create_model(network)
+    model = wrappers.create_model(network)
 
     # Just test we're getting values that are numeric and reasonable
     assert 0 < model([BUS_PATH, "f1"])[0][0] < 10
@@ -123,7 +122,7 @@ def test_detect():
     with gzip.open(TINYYOLO_MODEL_PATH, "rb") as fin:
         network = json.load(fin)
 
-    model = create_model(network)
+    model = wrappers.create_model(network)
     image_path = os.path.join(TEST_IMAGE_DATA, "tolls.jpg")
 
     with Image.open(image_path) as img:
@@ -133,6 +132,24 @@ def test_detect():
 
 
 def test_tiff_image():
-    img = to_image_pixels(TIFF_PATH, None)
+    img = load.to_image_pixels(TIFF_PATH, None)
     assert type(img) == np.ndarray
     assert img.shape == (600, 800, 3)
+
+
+def create_feature_extractor(zipped_model_path):
+    with gzip.open(zipped_model_path, "rb") as fin:
+        network = json.load(fin)
+
+    return wrappers.create_image_feature_extractor(network, None)
+
+def test_image_feature_extractor():
+    ex1 = create_feature_extractor(TWO_FIELD_MODEL_PATH)
+    ex2 = create_feature_extractor(MOBILENET_PATH)
+    ex3 = wrappers.create_image_feature_extractor("resnet18", None)
+    ex4 = wrappers.create_image_feature_extractor("mobilenet", None)
+
+    ex1(BUS_PATH).shape == (1, 128)
+    ex2(BUS_PATH).shape == (1, 1024)
+    ex3(BUS_PATH).shape == (1, 512)
+    ex4(BUS_PATH).shape == (1, 1280)

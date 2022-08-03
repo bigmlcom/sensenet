@@ -14,14 +14,14 @@ import warnings
 from contextlib import contextmanager
 from PIL import Image
 
-from sensenet.constants import NUMERIC_INPUTS, IMAGE, WARP, PAD
-
-from sensenet.accessors import is_yolo_model, get_output_exposition
-from sensenet.load import load_points, count_types
-from sensenet.models.bounding_box import box_detector
-from sensenet.models.bundle import read_bundle, write_bundle, BUNDLE_EXTENSION
-from sensenet.models.deepnet import deepnet_model
-from sensenet.models.settings import ensure_settings
+import sensenet.accessors as accessors
+import sensenet.constants as constants
+import sensenet.load as load
+import sensenet.models.bounding_box as bounding_box
+import sensenet.models.bundle as bundle
+import sensenet.models.deepnet as deepnet
+import sensenet.models.image as image
+import sensenet.models.settings as models_settings
 
 SETTINGS_PATH = os.path.join("assets", "settings.json")
 
@@ -43,8 +43,13 @@ class SaveableModel(object):
             self._model = keras_model
 
             if settings:
-                for key in settings:
-                    setattr(self, key, settings[key])
+                if isinstance(settings, models_settings.Settings):
+                    settings_dict = vars(settings)
+                else:
+                    settings_dict = settings
+
+                for key in settings_dict:
+                    setattr(self, key, settings_dict[key])
 
     def save_weights(self, save_path):
         self._model.save_weights(save_path)
@@ -75,10 +80,10 @@ class SaveableModel(object):
                 'Name "%s" from "%s" is invalid' % (model_name, save_path)
             )
 
-        if save_path.endswith(BUNDLE_EXTENSION):
+        if save_path.endswith(bundle.BUNDLE_EXTENSION):
             out_path = save_path
         else:
-            out_path = save_path + BUNDLE_EXTENSION
+            out_path = save_path + bundle.BUNDLE_EXTENSION
 
         assert not os.path.exists(out_path)
 
@@ -93,7 +98,7 @@ class SaveableModel(object):
             with open(os.path.join(model_path, SETTINGS_PATH), "w") as fout:
                 json.dump(attributes, fout)
 
-            bundle_file = write_bundle(model_path)
+            bundle_file = bundle.write_bundle(model_path)
             shutil.copy(bundle_file, out_path)
 
             if tfjs_path:
@@ -110,7 +115,7 @@ class Deepnet(SaveableModel):
         super().__init__(model, settings)
 
         if isinstance(model, dict):
-            outex = get_output_exposition(model)
+            outex = accessors.get_output_exposition(model)
 
             try:
                 self._classes = outex["values"]
@@ -118,17 +123,17 @@ class Deepnet(SaveableModel):
                 self._classes = None
 
             self._preprocessors = model["preprocess"]
-            self._model = deepnet_model(model, settings)
+            self._model = deepnet.deepnet_model(model, settings)
 
         # Pretrained image networks should be the only thing missing
         # this `_preprocessors` attribute
         if getattr(self, "_preprocessors", None) is None:
-            self._preprocessors = [{"type": IMAGE, "index": 0}]
+            self._preprocessors = [{"type": constants.IMAGE, "index": 0}]
 
-        self._ncolumns, self._nimages = count_types(self._preprocessors)
+        self._ncolumns, self._nimages = load.count_types(self._preprocessors)
 
     def load_and_predict(self, points):
-        pvec = load_points(self._preprocessors, points)
+        pvec = load.load_points(self._preprocessors, points)
         return self._model.predict(pvec)
 
     def __call__(self, input_data):
@@ -186,7 +191,7 @@ class ObjectDetector(SaveableModel):
         super().__init__(model, settings)
 
         if isinstance(model, dict):
-            self._model = box_detector(model, settings)
+            self._model = bounding_box.box_detector(model, settings)
             self._classes = model["output_exposition"]["values"]
             self._unfiltered = settings.output_unfiltered_boxes
             self._preprocessors = model["preprocess"]
@@ -194,7 +199,7 @@ class ObjectDetector(SaveableModel):
             self._unfiltered = settings["output_unfiltered_boxes"]
 
     def load_and_predict(self, points):
-        pvec = load_points(self._preprocessors, points)
+        pvec = load.load_points(self._preprocessors, points)
         return self._model.predict(pvec)
 
     def __call__(self, input_data):
@@ -270,7 +275,7 @@ def bigml_resource(resource):
 
 
 def model_from_dictionary(model_dict, settings):
-    settings_object = ensure_settings(settings)
+    settings_object = models_settings.ensure_settings(settings)
 
     if bigml_resource(model_dict):
         model = bigml_resource(model_dict)
@@ -278,7 +283,7 @@ def model_from_dictionary(model_dict, settings):
         model = model_dict
 
     if is_deepnet(model):
-        if is_yolo_model(model):
+        if accessors.is_yolo_model(model):
             return ObjectDetector(model, settings_object)
         else:
             return Deepnet(model, settings_object)
@@ -292,7 +297,7 @@ def model_from_bundle(bundle_file):
     with tempfile.TemporaryDirectory() as saved_model_temp:
         temp_bundle = os.path.join(saved_model_temp, bundle_name)
         shutil.copyfile(bundle_file, temp_bundle)
-        model_dir = read_bundle(temp_bundle)
+        model_dir = bundle.read_bundle(temp_bundle)
 
         model = tf.keras.models.load_model(model_dir)
         settings_path = os.path.join(model_dir, SETTINGS_PATH)
@@ -316,7 +321,7 @@ def model_from_bundle(bundle_file):
 def create_model(anobject, settings=None):
     if isinstance(anobject, str):
         if os.path.exists(anobject):
-            if anobject.endswith(BUNDLE_EXTENSION):
+            if anobject.endswith(bundle.BUNDLE_EXTENSION):
                 return model_from_bundle(anobject)
             else:
                 with open(anobject, "r") as fin:
@@ -372,10 +377,10 @@ def convert(model, settings, output_path, to_format):
     if isinstance(model, SaveableModel):
         model_object = model
     else:
-        model_settings = ensure_settings(settings)
+        model_settings = models_settings.ensure_settings(settings)
 
         if to_format == "tflite":
-            model_settings.rescale_type = WARP
+            model_settings.rescale_type = constants.WARP
 
         model_object = create_model(model, settings=model_settings)
 
@@ -408,3 +413,24 @@ def tflite_predict(tflite_model, image_file):
     output_details = interpreter.get_output_details()
 
     return [interpreter.get_tensor(od["index"]) for od in output_details]
+
+
+def create_image_feature_extractor(anobject, input_settings):
+    settings = models_settings.ensure_settings(input_settings)
+    settings.extract_image_features = True
+
+    if isinstance(anobject, str):
+        if os.path.exists(anobject):
+            with open(anobject, "r") as fin:
+                model_dict = json.load(fin)
+
+            model = model_from_dictionary(model_dict, settings)._model
+        else:
+            settings.load_pretrained_weights = True
+            model = image.pretrained_image_model(anobject, settings)
+    elif isinstance(anobject, dict):
+        model = model_from_dictionary(anobject, settings)._model
+    else:
+        raise TypeError("Input argument cannot be a %s" % str(type(anobject)))
+
+    return Deepnet(image.image_feature_extractor(model), settings)

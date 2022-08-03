@@ -15,6 +15,8 @@ logging.getLogger("tensorflow").setLevel(logging.ERROR)
 warnings.filterwarnings("ignore", message=".*binary incompatibility.*")
 warnings.filterwarnings("ignore", message=".*in favour of importlib.*")
 warnings.filterwarnings("ignore", message=".*alias for the builtin.*")
+warnings.filterwarnings("ignore", message=".*Pillow 10.*Resampling.*")
+warnings.filterwarnings("ignore", message=".*distutils Version classes.*")
 
 
 import numpy
