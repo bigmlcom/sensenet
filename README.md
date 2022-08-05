@@ -30,26 +30,47 @@ variable `BIGML_SENSENET_CACHE_PATH`.
 
 ## Model Instantiation
 
-To instantiate a model, pass the model specification and the dict
-of additional, optional settings to `create_model`.  For example:
+To instantiate a model, pass the model specification and the dict of
+additional, optional settings to `models.wrappers.create_model`.  For
+example:
 
 ```
-model = create_model(a_dict, settings={'image_path_prefix': 'images/path/'})
+model = wrappers.create_model(a_dict, settings={'image_path_prefix': 'images/path/'})
 ```
 
 Again, `a_dict` is typically a downloaded BigML model, read into a
-python dictionary via `json.load` or similar.
-
-You may also pass the path to a file containing such a model:
+python dictionary via `json.load` or similar.  You may also pass the
+path to a file containing such a model:
 
 ```
-model = create_model('model.json', settings=None)
+model = wrappers.create_model('model.json', settings=None)
 ```
 
-For image models, `settings` is either `None` (the default) or a dict
-of optional settings which may contain:
+A similar function, `models.wrappers.create_image_feature_extractor`,
+allows clients to create a model object that returns instead the
+outputs of the final global pooling or flattening layer of the image
+model, given an image as input:
+
+```
+extractor = create_image_feature_extractor("resnet18", None)
+extractor("path/to/image.jpeg").shape # (1, 512)
+```
+
+Note that this only works for networks with at least one image input,
+and does not work for bounding box models, as there is no global
+pooling or flattening step in those models.
+
+For both `create_image_feature_extractor` and `create model`,
+`settings` can either be `None` (the default) or a dict of optional
+settings which may contain any of the settings arguments listed below.
 
 ### Settings Arguments
+
+These arguments can be passed to
+`models.wrappers.create_image_feature_extractor` or
+`models.wrappers.create_model` to change the input or output behavior
+of the model.  Note that the settings specific to bounding box models
+are ignored if the model is not of the bounding box type.
 
 - `bounding_box_threshold`: For object detection models only, the
   minimal score that an object can have and still be surfaced to the
@@ -70,11 +91,6 @@ of optional settings which may contain:
   `'pixel_values'`, and will possibly break predictions if specified
   when the input is a file.
 
-- `image_path_prefix`: A string directory indicating the path where
-  images are to be found for image predictions.  When an image path is
-  passed at prediction time, this string is prepended to the given
-  path.
-
 - `iou_threshold`: A threshold indicating the amount of overlap boxes
   predicting the same class should have before they are considered to
   be bounding the same object.  The default is 0.5, and lower values
@@ -82,7 +98,7 @@ of optional settings which may contain:
   surfaced to the user.
 
 - `max_objects`: The maximum number of bounding boxes to return for
-  each image.  The default is 32.
+  each image in bounding box models.  The default is 32.
 
 - `rescale_type`: A string which is one of `['warp', 'pad', 'crop']`.
   If `'warp'`, input images are scaled to the input dimensions
@@ -100,6 +116,10 @@ of optional settings which may contain:
   sizes in previous example, the image would be rescaled to 100 x 200
   (preserving its aspect ratio) then cropped by 50 pixels on the top
   and bottom to create a 100 x 100 image.
+
+While these are not the only settings possible, these are the ones
+most likely to be useful to clients; other settings are typically only
+useful for very specific client applications.
 
 ### Model Formats and Conversion
 
@@ -125,7 +145,7 @@ input and can output the following formats:
   deleted.  To extract the bundle without instantiating the model, see
   the functions in `sensenet.models.bundle`.
 
-- `h5` exports the model **weights only** to the keras h5 model format
+- `h5` exports the model **weights only** to the Keras h5 model format
   (i.e., via use of the TensorFlow function
   `tf.keras.Model.save_weights`) To use these, you'd instantiate the
   model from JSON and load the weights separately using the

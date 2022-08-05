@@ -416,6 +416,31 @@ def tflite_predict(tflite_model, image_file):
 
 
 def create_image_feature_extractor(anobject, input_settings):
+    """Create an image feature extractor
+
+    The first argument to the function can be either a string or a
+    dictionary.  If a string, the string can either be the path to a
+    file containing a JSON object that specifies a BigML deepnet model
+    with at least one image input, or the name of one of the
+    pretrained networks (see settings.pretrained).  If a dictionary,
+    it should be a BigML model specification; e.g., the result of
+    reading a BigML model JSON file.
+
+    The resulting predictor will output the values of the final
+    pooling or flattening layer of the image model.  It can be used on
+    single images in the same way as the output of `create_model`.
+    For example:
+
+    ```
+    extractor = create_image_feature_extractor("resnet18", None)
+    extractor("path/to/image.jpeg").shape # (1, 512)
+    ```
+
+    The `input_settings` is a dictionary that can be used to specify
+    things like the color space and type of rescaling to be used (see
+    sensenet.models.settings).
+    """
+
     settings = models_settings.ensure_settings(input_settings)
     settings.extract_image_features = True
 

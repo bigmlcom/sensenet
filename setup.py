@@ -12,7 +12,7 @@ from sensenet import __version__, __tree_ext_prefix__
 here = os.path.abspath(os.path.dirname(__file__))
 
 TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
-TF_VER = ">=2.9,<2.10"
+TF_VER = ">=2.8,<2.9"
 
 deps = [
     "pillow>=9.1,<9.2",
@@ -52,8 +52,7 @@ else:
         raise ImportError("Tensorflow is not in the build environment.")
 
     compile_args = ["-std=c++14", "-fPIC"] + tf.sysconfig.get_compile_flags()
-    sys.stderr.write(tf.sysconfig.get_lib() + "\n")
-    sys.stderr.flush()
+
     tree_module = setuptools.Extension(
         __tree_ext_prefix__,
         define_macros=[("MAJOR_VERSION", "1"), ("MINOR_VERSION", "1")],

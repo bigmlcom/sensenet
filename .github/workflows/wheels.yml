@@ -11,6 +11,7 @@ jobs:
       CIBW_ARCHS_MACOS: x86_64 arm64
       CIBW_ARCHS_LINUX: auto aarch64
       CIBW_BUILD: cp38-* cp39-* cp310-*
+      CIBW_BUILD_VERBOSITY: 1
       # Right now, cp310 isn't building properly on aarch64
       CIBW_SKIP: cp36-* *-win32 *-manylinux_i686 pp* *musllinux* cp310-*_aarch64
       CIBW_BEFORE_ALL_LINUX: 'POLICY_JSON=$(find / -name manylinux-policy.json); sed -i "s/libresolv.so.2\"/libresolv.so.2\",\"libtensorflow_framework.so.1\", \"libtensorflow_framework.so.2\"/g" $POLICY_JSON'
@@ -19,7 +20,7 @@ jobs:
       CIBW_TEST_COMMAND: 'cd {package} && pytest -sv tests/test_tree.py && pytest -sv tests/test_wrappers.py'
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -53,8 +54,8 @@ jobs:
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    # upload to PyPI on every tag starting with 'v'
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    # Upload to PyPI on every tag push
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v2
         with:
