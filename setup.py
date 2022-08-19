@@ -16,6 +16,8 @@ TF_VER = ">=2.8,<2.9"
 
 deps = [
     "pillow>=9.1,<9.2",
+    # Until we upgrade tensorflow, we need to pin this version
+    "protobuf<3.21",
 ]
 
 # The installation of `tensorflow-gpu` should be specific to canonical
