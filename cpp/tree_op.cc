@@ -17,7 +17,7 @@ REGISTER_OP("BigMLTreeify")
         auto nprobs = c->Dim(c->input(5), 2);
         c->set_output(0, c->Matrix(npoints, nprobs));
 
-        return Status::OK();
+        return OkStatus();
     });
 
 class BigMLTreeOp : public OpKernel {
