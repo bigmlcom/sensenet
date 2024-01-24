@@ -12,11 +12,11 @@ from sensenet import __version__, __tree_ext_prefix__
 here = os.path.abspath(os.path.dirname(__file__))
 
 TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
-TF_VER = ">=2.14,<2.15"
+TF_VER = ">=2.15,<2.16"
 
 deps = [
-    "pillow>=10.0.1,<10.1",
-    "scikit-learn>=1.3.1,<1.4",
+    "pillow>=10.2.0,<10.2.1",
+    "scikit-learn>=1.4,<1.4.1",
     "pytest>=7.4.2,<7.5",
 ]
 
@@ -39,7 +39,7 @@ if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
 # quite picky about its numpy version, and you have to let it pull in
 # the exact version that tensorflow was built with.
 if platform.machine() not in ["aarch64", "arm64"]:
-    deps += ["tensorflowjs>=4.11,<4.12", "numpy>=1.25.2,<1.26"]
+    deps += ["tensorflowjs>=4.16,<4.17", "numpy>=1.26.3,<1.27"]
 
 # Get the long description from the relevant file
 with open(os.path.join(here, "README.md"), "r") as f:
