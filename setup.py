@@ -2,12 +2,13 @@
 """
 
 import os
-import sys
 import platform
+import sys
+
 import pkg_resources
 import setuptools
 
-from sensenet import __version__, __tree_ext_prefix__
+from sensenet import __tree_ext_prefix__, __version__
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -78,6 +79,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     package_data={"sensenet": ["sensenet_metadata.json.gz"]},
+    python_requires=">=3.9",
     ext_modules=modules,
     install_requires=deps,
 )

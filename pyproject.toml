@@ -9,3 +9,6 @@ requires=[
 [tool.black]
 line-length = 80
 target-version = ['py311']
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = "auditwheel repair --exclude libtensorflow_framework.so.2 --exclude libtensorflow_framework.so.1 --exclude libtensorflow_framework.so -w {dest_dir} {wheel}"
