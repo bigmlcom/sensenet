@@ -12,18 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.9]
+        python: [3.9,3.10,3.11]
     env:
         TF_CPP_MIN_LOG_LEVEL: 2
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
-
-    - name: Install test dependencies
-      run: |
-        pip install pytest
-        pip install "scikit-learn>=1.0,<1.1"
+      uses: actions/checkout@v4
 
     - name: Install sensenet
       run: |
