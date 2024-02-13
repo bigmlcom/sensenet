@@ -1,21 +1,21 @@
-import os
+# flake8: noqa: E402
 import json
-import time
-import pytest
+import os
 
+import pytest
 import sensenet.importers
 
 np = sensenet.importers.import_numpy()
 tf = sensenet.importers.import_tensorflow()
 
-from sensenet.constants import NUMERIC, CATEGORICAL
-from sensenet.preprocess.preprocessor import Preprocessor
+from sensenet.constants import CATEGORICAL, NUMERIC
 from sensenet.layers.construct import remove_weights
 from sensenet.layers.legacy import legacy_convert
 from sensenet.layers.tree import ForestPreprocessor
 from sensenet.load import load_points
-from sensenet.models.wrappers import create_model
 from sensenet.models.settings import Settings
+from sensenet.models.wrappers import create_model
+from sensenet.preprocess.preprocessor import Preprocessor
 
 from .utils import TEST_DATA_DIR, read_regression
 
@@ -73,6 +73,7 @@ def round_trip(settings, wrapper):
     # print('save weights: %.2f' % (time.time() - start))
     # start = time.time()
     new_wrapper = create_model(short, EXTRA_PARAMS)
+    assert new_wrapper
     # print('recreate model: %.2f' % (time.time() - start))
     # start = time.time()
     new_wrapper._model.load_weights(TEMP_WEIGHTS)

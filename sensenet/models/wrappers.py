@@ -1,3 +1,4 @@
+# flake8: noqa: E402
 import sensenet.importers
 
 np = sensenet.importers.import_numpy()
@@ -7,12 +8,10 @@ tfjs = sensenet.importers.import_tfjs()
 import json
 import os
 import shutil
-import tempfile
 import sys
+import tempfile
 import warnings
-
 from contextlib import contextmanager
-from PIL import Image
 
 import sensenet.accessors as accessors
 import sensenet.constants as constants
@@ -22,6 +21,7 @@ import sensenet.models.bundle as bundle
 import sensenet.models.deepnet as deepnet
 import sensenet.models.image as image
 import sensenet.models.settings as models_settings
+from PIL import Image
 
 SETTINGS_PATH = os.path.join("assets", "settings.json")
 
@@ -64,11 +64,11 @@ class SaveableModel(object):
     def write_tfjs_files(self, model_path, save_path):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message=".*alias for the.*")
-
             with suppress_stdout():
-                tfjs.converters.convert_tf_saved_model(
-                    model_path, save_path, skip_op_check=True
-                )
+                if tfjs:
+                    tfjs.converters.convert_tf_saved_model(
+                        model_path, save_path, skip_op_check=True
+                    )
 
     def save_bundle(self, save_path, tfjs_path=None):
         outdir, model_name = os.path.split(save_path)

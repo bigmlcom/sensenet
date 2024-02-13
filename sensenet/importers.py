@@ -2,11 +2,11 @@
 various messages on import.
 
 """
-import sys
-import os
-import logging
-import warnings
 import glob
+import logging
+import os
+import sys
+import warnings
 
 from sensenet import __tree_ext_prefix__
 
@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore", message=".*Pillow 10.*Resampling.*")
 warnings.filterwarnings("ignore", message=".*distutils Version classes.*")
 
 
-import numpy
+import numpy  # noqa: E402
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", message=".*as a synonym of type.*")
@@ -27,11 +27,13 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", message=".*details.*")
 
     import tensorflow
-    import tensorflow.keras.layers
+    import tensorflow.keras.layers  # type: ignore
 
+    # tensoflowjs is not available in all architectures (see setup.py)
+    # but it is not mandatory for Sensenet to work
     try:
         import tensorflowjs
-    except:
+    except:  # noqa: E722
         tensorflowjs = None
 
 bigml_tf_module = None

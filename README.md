@@ -134,7 +134,9 @@ input and can output the following formats:
   allows lightweight prediction on mobile devices.
 
 - `tfjs` exports the model to the format read by Tensorflow JS to do
-  predictions in the browser and server-side in node.js.
+  predictions in the browser and server-side in node.js. The library
+  needed to do this export, `tensorflowjs`, is not available in all
+  architectures, so this feature may not always work.
 
 - `smbundle` exports the model to a (proprietary) lightweight wrapper
   around the TensorFlow SavedModel format.  The generated file is a
