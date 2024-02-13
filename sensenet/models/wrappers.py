@@ -65,7 +65,7 @@ class SaveableModel(object):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message=".*alias for the.*")
             with suppress_stdout():
-                if tfjs:
+                if tfjs and tfjs.converters:
                     tfjs.converters.convert_tf_saved_model(
                         model_path, save_path, skip_op_check=True
                     )

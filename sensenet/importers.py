@@ -10,6 +10,7 @@ import warnings
 
 from sensenet import __tree_ext_prefix__
 
+logger = logging.getLogger(__name__)
 logging.getLogger("tensorflow").setLevel(logging.ERROR)
 
 warnings.filterwarnings("ignore", message=".*binary incompatibility.*")
@@ -33,7 +34,10 @@ with warnings.catch_warnings():
     # but it is not mandatory for Sensenet to work
     try:
         import tensorflowjs
-    except:  # noqa: E722
+    except Exception as e:  # noqa: E722
+        logger.info(
+            f"tensorflowjs not found, you can't export models to JS: {e}"
+        )
         tensorflowjs = None
 
 bigml_tf_module = None

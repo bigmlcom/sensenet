@@ -1,21 +1,24 @@
+# flake8:  noqa: E402
 import sensenet.importers
 
 np = sensenet.importers.import_numpy()
 tf = sensenet.importers.import_tensorflow()
 
-import os
-import shutil
 import gzip
 import json
-
-from PIL import Image
+import os
+import shutil
 
 from sensenet.constants import WARP
-from sensenet.models.wrappers import Deepnet, ObjectDetector
-from sensenet.models.wrappers import convert, tflite_predict
+from sensenet.models.wrappers import (
+    Deepnet,
+    ObjectDetector,
+    convert,
+    tflite_predict,
+)
 
-from .utils import TEST_DATA_DIR, TEST_IMAGE_DATA
 from .test_pretrained import create_image_model
+from .utils import TEST_DATA_DIR, TEST_IMAGE_DATA
 
 MOBILENET_PATH = os.path.join(TEST_DATA_DIR, "mobilenetv2.json.gz")
 TEST_SAVE_MODEL = os.path.join(TEST_DATA_DIR, "test_model_save")
@@ -118,8 +121,7 @@ def test_all_conversions():
     for aformat in ["tflite", "tfjs", "smbundle", "h5"]:
         outpath = TEST_SAVE_MODEL + "." + aformat
         convert(jmodel, None, outpath, aformat)
-
         if aformat == "tfjs":
-            shutil.rmtree(outpath)
+            shutil.rmtree(outpath, ignore_errors=True)
         else:
             os.remove(outpath)

@@ -26,4 +26,4 @@ jobs:
 
     - name: Run sensenet tests
       run: |
-        pytest -sv
+        pytest -xsv
