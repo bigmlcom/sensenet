@@ -13,9 +13,10 @@ from sensenet import __tree_ext_prefix__, __version__
 here = os.path.abspath(os.path.dirname(__file__))
 
 TF_PACKAGES = ["tensorflow-gpu", "tensorflow-cpu"]
-TF_VER = ">=2.15,<2.16"
+TF_VER = ">=2.16,<2.17"
 
 deps = [
+    "tf-keras~=2.16",
     "pillow>=10.2.0,<10.2.1",
     "scikit-learn>=1.4,<1.4.1",
     "pytest>=7.4.2,<7.5",
