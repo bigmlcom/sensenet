@@ -22,6 +22,8 @@ warnings.filterwarnings("ignore", message=".*distutils Version classes.*")
 
 import numpy  # noqa: E402
 
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", message=".*as a synonym of type.*")
     warnings.filterwarnings("ignore", message=".*binary incompatibility.*")
