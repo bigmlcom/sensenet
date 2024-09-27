@@ -31,8 +31,6 @@ if not any(pkg.key in TF_PACKAGES for pkg in pkg_resources.working_set):
     # for our architecture
     if platform.machine() == "aarch64" and platform.system() == "Linux":
         deps += ["tensorflow-aarch64%s" % TF_VER]
-    elif platform.machine() == "arm64" and platform.system() == "Darwin":
-        deps += ["tensorflow-macos%s" % TF_VER]
     else:
         deps += ["tensorflow%s" % TF_VER]
 
