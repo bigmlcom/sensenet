@@ -37,7 +37,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: artifact-${{ matrix.os }}
+          name: artifact
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: artifact-${{ matrix.os }}
+          name: artifact
           path: dist/*.tar.gz
 
   upload_pypi:
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
-          pattern: artifact-*
+          pattern: artifact*
 
       - uses: pypa/gh-action-pypi-publish@v1.4.2
         with:
