@@ -11,7 +11,7 @@ jobs:
       CIBW_BUILD: cp311-* cp312-* # build for Python 3.11 and 3.12
       CIBW_BUILD_VERBOSITY: 1
       CIBW_SKIP: cp36-* *-win32 *-manylinux_i686 pp* *musllinux*
-      CIBW_ARCHS_MACOS: x86_64 arm64  # arm64 for Apple Sillicon support
+      CIBW_ARCHS_MACOS: arm64 x86_64 # arm64 for Apple Sillicon support
       CIBW_ARCHS_LINUX: auto aarch64  # allowing arm processors
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: 'delocate-listdeps {wheel} && delocate-wheel --require-archs {delocate_archs} --ignore-missing-dependencies -w {dest_dir} {wheel}'
       # not needed because those packages are already in package requirements
