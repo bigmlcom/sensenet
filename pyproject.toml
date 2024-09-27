@@ -1,8 +1,7 @@
 [build-system]
 requires=[
-  "tensorflow <2.17,>=2.16;sys_platform=='darwin' and platform_machine=='arm64'",
   "tensorflow-aarch64 <2.17,>=2.16;sys_platform=='linux' and platform_machine=='aarch64'",
-  "tensorflow <2.17,>=2.16;platform_machine!='arm64' and platform_machine!='aarch64'",
+  "tensorflow <2.17,>=2.16; platform_machine!='aarch64'",
   "setuptools"
 ]
 
